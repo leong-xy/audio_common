@@ -10,28 +10,11 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
 find_package(audio_common_msgs REQUIRED)
 find_package(action_msgs REQUIRED)
+find_package(sound_play_msgs REQUIRED)
 
-include_directories(rclcpp audio_common_msgs action_msgs builtin_interfaces)
-
-set(msg_files
-  "msg/SoundRequest.msg"
-)
-
-set(action_files
-  "action/SoundRequest.action"
-)
-
-rosidl_generate_interfaces(${PROJECT_NAME}
-  ${msg_files}
-  ${action_files}
-  DEPENDENCIES
-    action_msgs
-    audio_common_msgs
-    builtin_interfaces
-)
+include_directories(rclcpp audio_common_msgs action_msgs sound_play_msgs builtin_interfaces)
 
 ament_python_install_package(${PROJECT_NAME})
 
@@ -58,7 +41,5 @@ install(DIRECTORY launch
 install(DIRECTORY sounds
   DESTINATION share/${PROJECT_NAME}
 )
-
-ament_export_dependencies(rosidl_default_runtime)
 
 ament_package()
