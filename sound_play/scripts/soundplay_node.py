@@ -451,8 +451,10 @@ class SoundPlayNode(rclpy.node.Node):
                         and data.command == SoundRequest.PLAY_STOP):
                     self.stopall()
                 else:
-                    sound = self.select_sound(data)
-                    sound.command(data.command)
+                    if (len(self.active_instances) == 0 or self.active_instances[-1].file != data.arg):
+                        self.stopall()
+                        sound = self.select_sound(data)
+                        sound.command(data.command)
             except Exception as e:
                 self.get_logger().error('Exception in callback: %s' % str(e))
                 self.get_logger().info(traceback.format_exc())
