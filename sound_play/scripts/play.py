@@ -61,7 +61,7 @@ if __name__ == '__main__':
             'for the sound as a value between 0 and 1.0, where 0 is mute.'
         )
         exit(1)
-    soundhandle = SoundClient(node, blocking=True)
+    soundhandle = SoundClient(node, blocking=False)
 
     time.sleep(1)
     node.get_logger().info('Playing "%s".' % argv[1])
