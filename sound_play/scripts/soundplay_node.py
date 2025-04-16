@@ -157,14 +157,7 @@ class SoundType(object):
             self.lock.acquire()
             try:
                 self.sound.set_state(Gst.State.NULL)
-                # 等待状态变更完成
-                _, state, _ = self.sound.get_state(Gst.CLOCK_TIME_NONE)
-                if state == Gst.State.NULL:
-                    self.state = self.STOPPED
-                else:
-                    self.node.get_logger().warning("Failed to set state to NULL")
-            except Exception as e:
-                self.node.get_logger().error(f"Error stopping sound: {str(e)}")
+                self.state = self.STOPPED
             finally:
                 self.lock.release()
 
@@ -217,8 +210,6 @@ class SoundPlayNode(rclpy.node.Node):
     def __init__(self):
         super().__init__('sound_play')
         Gst.init(None)
-
-        self.active_instances = []
 
         # Start gobject thread to receive gstreamer messages
         GObject.threads_init()
@@ -290,11 +281,6 @@ class SoundPlayNode(rclpy.node.Node):
             sound.stop()
 
     def stopall(self):
-        # 新增：停止所有活跃实例
-        for sound in self.active_instances:
-            sound.stop()
-        self.active_instances.clear()
-
         self.stopdict(self.builtinsounds)
         self.stopdict(self.filesounds)
         self.stopdict(self.voicesounds)
@@ -303,7 +289,7 @@ class SoundPlayNode(rclpy.node.Node):
         if data.sound == SoundRequest.PLAY_FILE:
             if not data.arg2:
                 if data.arg not in self.filesounds.keys():
-                    self.get_logger().info(
+                    self.get_logger().debug(
                         'command for uncached wave: "%s"' % data.arg)
                     try:
                         self.filesounds[data.arg] = SoundType(
@@ -438,7 +424,6 @@ class SoundPlayNode(rclpy.node.Node):
             #                    if self.active_sounds > self.num_channels:
             #                        mixer.set_num_channels(self.active_sounds)
             #                        self.num_channels = self.active_sounds
-            self.active_instances.append(sound)  # 记录活跃实例
         return sound
 
     def callback(self, data):
